@@ -29,7 +29,7 @@ See `.claude/rules/`. The categories are:
 - `git-workflow.md` — commit format, PR process
 - `performance.md` — model selection, MCP discipline
 
-These are loaded into Claude on every session. Keep them tight.
+Claude must treat these as project rules and consult them whenever relevant. Keep them tight.
 
 ## Conventions specific to this project
 
@@ -39,6 +39,38 @@ These are loaded into Claude on every session. Keep them tight.
 
 Add only conventions Claude *must* enforce on every turn. Anything more specific belongs in the relevant rules file.
 
+## Layman operator protection
+
+The user may not use CLI tools directly and may not know repository internals.
+
+Claude must therefore:
+
+- Explain technical risks in plain English before taking risky action.
+- Identify when a request may affect architecture, dependencies, schema, security, tests, CI, or deployment.
+- Avoid assuming the user knows which files are safe to edit.
+- Prefer small, reviewable changes over broad rewrites.
+- Ask before destructive or wide-scope changes, including deleting files, changing schemas, adding dependencies, rewriting history, or modifying CI/deployment config.
+- Never require the user to manually run shell commands unless absolutely necessary.
+- When commands are needed, explain what they do and why.
+- At the end of each task, report what changed, which files changed, what checks ran, whether the task is complete, and any remaining risks.
+
+## First prompt after bootstrap
+
+After this starter config is added to a new repo, the first Claude Code session should begin with:
+
+```text
+Read CLAUDE.md and inspect .claude/rules/. Then inspect this repo at a high level and tell me:
+1. what stack you detect,
+2. what build, lint, typecheck, and test commands appear to exist,
+3. what files or folders look like the main source and test areas,
+4. what project-specific placeholders in CLAUDE.md still need filling in,
+5. any immediate risks before development starts.
+
+Do not modify files yet.
+```
+
+Claude should answer this as an orientation report before implementation work begins.
+
 ## How to start a new session
 
 1. Check `.claude/sessions/` for the most recent entry. If it's relevant, ask Claude to load it.
@@ -46,7 +78,8 @@ Add only conventions Claude *must* enforce on every turn. Anything more specific
    - Routine work → Sonnet (default)
    - Architecture, hard bugs, security → Opus
    - File search, simple edits → Haiku
-3. State the objective in one sentence before any code.
+3. Confirm the project’s build, lint, typecheck, and test commands from repo evidence such as README files, package files, CI config, `pyproject.toml`, `Cargo.toml`, `go.mod`, or equivalent.
+4. State the objective in one sentence before any code.
 
 ## How to end a session
 

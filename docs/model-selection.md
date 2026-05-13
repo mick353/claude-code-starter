@@ -5,6 +5,7 @@ Picking the right model per task is the single biggest cost-and-latency lever yo
 ## The matrix
 
 These are starting points, not laws. Adjust based on your workload.
+Claude Code should use this matrix to select or recommend the appropriate model, depending on what the current environment supports.
 
 | Task type | Model | Why |
 |---|---|---|

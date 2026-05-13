@@ -45,7 +45,7 @@ The template includes placeholders like `<STACK>`, `<RUNTIME>`, and "Where thing
 
 ## What this is
 
-About a dozen files. Roughly:
+A few dozen files. Roughly:
 
 - **`docs/`** — Six short guides on the things most people get wrong: context economics, model selection, parallelization, memory, evals, and subagent orchestration.
 - **`claude/rules/`** — A compact rules taxonomy that drops into a project's `.claude/rules/` (or `~/.claude/rules/` for terminal CLI users).

@@ -56,12 +56,12 @@
       ]
     },
     {
-      "_purpose": "Warn on console.log in production paths.",
-      "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\" && !(tool_input.file_path matches \"(test|spec|stories)\\\\.(ts|tsx|js|jsx)$\")",
+      "_purpose": "Warn on console.log in production paths. Claude Code passes tool input as JSON on stdin; read file_path with jq. Matcher uses tool-name alternation (not a DSL expression) per the Claude Code hook spec.",
+      "matcher": "Edit|Write",
       "hooks": [
         {
           "type": "command",
-          "command": "if grep -nE 'console\\\\.(log|warn|error|info|debug)' \"$file_path\" >/dev/null 2>&1; then echo \"[warn] $file_path contains console.* — remove before committing\" >&2; fi"
+          "command": "file=$(jq -r '.tool_input.file_path // empty'); [ -z \"$file\" ] && exit 0; case \"$file\" in *.ts|*.tsx|*.js|*.jsx) ;; *) exit 0;; esac; case \"$file\" in *test*|*spec*|*stories*) exit 0;; esac; grep -nE 'console\\.(log|warn|error|info|debug)' \"$file\" >/dev/null 2>&1 && echo \"[warn] $file contains console.* — remove before committing\" >&2; exit 0"
         }
       ]
     }

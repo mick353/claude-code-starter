@@ -1,0 +1,105 @@
+{
+  "_comment": "Example hooks for Claude Code. Copy what you want into your ~/.claude/settings.json under the 'hooks' key. Every hook here is opt-in — uncomment and adapt to your stack. The principles: stay quiet on the success path, write to stderr only when there's something the user should know, and never block unless the situation is truly destructive.",
+
+  "PreToolUse": [
+    {
+      "_purpose": "Suggest tmux for long-running commands so the user can detach/reattach.",
+      "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm run dev|pnpm dev|yarn dev|cargo run|python -m http.server|next dev)\"",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "if [ -z \"$TMUX\" ]; then echo '[hint] long-running command — consider tmux for session persistence' >&2; fi"
+        }
+      ]
+    },
+    {
+      "_purpose": "Open editor for review before git push (catches accidental pushes of broken state).",
+      "matcher": "tool == \"Bash\" && tool_input.command matches \"^git push\"",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo '[review] About to push. Last 3 commits:' >&2; git log -3 --oneline >&2"
+        }
+      ]
+    },
+    {
+      "_purpose": "Block writing arbitrary new .md files at repo root (clutter prevention).",
+      "matcher": "tool == \"Write\" && tool_input.file_path matches \"^[^/]+\\\\.md$\" && !(tool_input.file_path matches \"^(README|CLAUDE|CONTRIBUTING|LICENSE|CHANGELOG|ATTRIBUTION)\\\\.md$\")",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "echo '[block] Refusing to create new top-level .md files. Put docs in docs/ or alongside code.' >&2; exit 2"
+        }
+      ]
+    }
+  ],
+
+  "PostToolUse": [
+    {
+      "_purpose": "Format on save for TypeScript/JavaScript files. Adapt to your formatter.",
+      "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "command -v prettier >/dev/null && prettier --write \"$file_path\" 2>/dev/null || true"
+        }
+      ]
+    },
+    {
+      "_purpose": "Quick typecheck on TypeScript edits — fails loudly if types broke.",
+      "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx)$\"",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "command -v tsc >/dev/null && tsc --noEmit 2>&1 | head -20 >&2 || true"
+        }
+      ]
+    },
+    {
+      "_purpose": "Warn on console.log in production paths.",
+      "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\" && !(tool_input.file_path matches \"(test|spec|stories)\\\\.(ts|tsx|js|jsx)$\")",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "if grep -nE 'console\\\\.(log|warn|error|info|debug)' \"$file_path\" >/dev/null 2>&1; then echo \"[warn] $file_path contains console.* — remove before committing\" >&2; fi"
+        }
+      ]
+    }
+  ],
+
+  "PreCompact": [
+    {
+      "_purpose": "Save important state before context compaction. Edit the script path to your needs.",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "mkdir -p .claude/sessions && echo \"[$(date +%Y-%m-%dT%H:%M:%S)] pre-compact checkpoint\" >> .claude/sessions/_compaction.log"
+        }
+      ]
+    }
+  ],
+
+  "Stop": [
+    {
+      "_purpose": "Warn if any modified file still contains console.log at end of response.",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "git diff --name-only --diff-filter=AM 2>/dev/null | xargs -I{} grep -lE 'console\\\\.(log|warn|error|info|debug)' {} 2>/dev/null | head -5 | while read f; do echo \"[stop] $f still has console.* — clean up before committing\" >&2; done"
+        }
+      ]
+    }
+  ],
+
+  "SessionStart": [
+    {
+      "_purpose": "Show the most recent session memory file, if one exists. Loads into Claude's view of the workspace.",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "latest=$(ls -t .claude/sessions/*.md 2>/dev/null | head -1); if [ -n \"$latest\" ]; then echo \"[session] Most recent session memory: $latest\" >&2; fi"
+        }
+      ]
+    }
+  ]
+}

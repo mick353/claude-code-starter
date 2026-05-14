@@ -2,21 +2,21 @@
 
 ## Primary source
 
-This starter pack distills patterns from [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code), specifically:
+This starter pack draws on [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code), specifically the two guide documents that introduce the core patterns:
 
 - [`the-shortform-guide.md`](https://github.com/affaan-m/everything-claude-code/blob/main/the-shortform-guide.md) (MIT)
 - [`the-longform-guide.md`](https://github.com/affaan-m/everything-claude-code/blob/main/the-longform-guide.md) (MIT)
 
-That repo is MIT-licensed, which is what makes this distillation possible.
+That repo is MIT-licensed and broader in scope than this one — it packages a wide range of agents, skills, hooks, and adapters across multiple AI coding harnesses. This pack is a deliberately narrower, opinionated subset focused on the patterns I rely on in daily use. Credit for surfacing many of the underlying ideas belongs there.
 
-## What was kept
+## Patterns kept
 
-Patterns from those guides that are present in this repo, in some form:
+Concepts from the source guides that are present here in some form, with notes on what I changed:
 
 | Pattern | Source | Where it lives here |
 |---|---|---|
 | Rules folder taxonomy (security/style/testing/git/perf) | shortform | `claude/rules/` |
-| Subagent roster (planner/reviewer/tdd-guide/etc.) | shortform | `claude/agents/` |
+| Subagent roster (planner/reviewer/tdd-guide/etc.) | shortform | `claude/agents/` — trimmed to 5, with sharper non-goals per agent |
 | MCP context economics — keep <10 enabled, <80 tools | shortform | `docs/context-economics.md` |
 | Model selection table (Haiku/Sonnet/Opus by task) | longform | `docs/model-selection.md` |
 | Session memory file pattern (`.claude/sessions/`) | longform | `docs/memory-persistence.md`, `claude/skills/strategic-compact/` |
@@ -31,30 +31,31 @@ Patterns from those guides that are present in this repo, in some form:
 | Search-before-coding workflow | shortform mentions | `claude/skills/search-first/` |
 | TDD workflow as a skill | shortform | `claude/skills/tdd-workflow/` |
 
-## What was deliberately left out
+## Patterns deliberately not carried over
 
-- **The 48 agents and 182 skills.** Most are boilerplate or hyper-narrow (e.g., separate skills for django-tdd, django-security, django-patterns, django-verification). A starter pack should be lean.
-- **The "instinct" / "continuous-learning-v2" branding.** Underneath the marketing, it's a Stop hook that saves patterns to a file. The pattern is mentioned in `docs/memory-persistence.md` without the rebrand.
-- **Cross-harness adapters** (Cursor, OpenCode, Codex). Useful only if you actually use those harnesses; orthogonal to the core ideas.
-- **The Tkinter dashboard, AgentShield, ECC Tools GitHub App.** Adjacent products, not core patterns.
-- **"Anthropic Hackathon Winner" framing and the heavy marketing tone.** Doesn't help you ship better code.
-- **Unverified performance claims** (e.g., "mgrep ~50% token reduction"). Mentioned skeptically in `docs/context-economics.md` rather than presented as fact.
-- **Multiple conflicting install paths** (plugin + manual + npm). This repo has exactly one: copy the files you want.
+This is the editorial half — what *didn't* make the cut and why. The choices reflect this repo's lean-by-design philosophy; reasonable people can reasonably disagree.
 
-## What was added
+- **The full agent and skill rosters.** The source ships dozens of each, including narrow per-framework variants (e.g., separate skills for django-tdd, django-security, django-patterns). This repo keeps a small generalist set on the view that a tight roster is easier to reason about than a deep menu.
+- **Continuous-learning hook patterns.** The underlying mechanism — a Stop hook that records reusable patterns to a file — is mentioned in `docs/memory-persistence.md`, but without a standalone skill. Adoption is easy enough to skip the abstraction.
+- **Cross-harness adapters** (Cursor, OpenCode, Codex). Genuinely useful if you use those harnesses; orthogonal to this repo's scope, which is Claude Code only.
+- **Adjacent tooling.** A Tkinter dashboard, marketplace-distributed plugins, and a paid GitHub App. All reasonable but outside the "config-pack" scope.
+- **Specific token-saving benchmark numbers.** Several tools (e.g., `mgrep`) are claimed to reduce token use by specific percentages on internal benchmarks. The general direction (smarter retrieval reduces context cost) is sound; the specific multipliers vary by workflow. This repo treats such numbers as directional rather than load-bearing — see `docs/context-economics.md` for the methodological note.
+- **Multiple install paths** (plugin marketplace + manual + npm). This repo has exactly one: the `bootstrap.sh` script for project-level use, with optional manual copy for user-level use.
 
-- **Critical commentary.** Where the source claim is shaky or context-dependent, this repo says so.
-- **A clear "philosophy" doc** stating the one principle everything else follows from.
-- **Trade-off discussion** in each doc — when *not* to use a pattern.
-- **Smaller agent definitions** focused on what they should *not* do, not just what they should.
+## What's new here
+
+- **A stated philosophy.** `docs/philosophy.md` makes the underlying principle explicit so trade-off decisions in later docs are anchored to it.
+- **Per-pattern reasoning, including when *not* to use each.** Each doc and skill includes an anti-pattern section. This is implicit in the source guides; this repo makes it explicit.
+- **Agent definitions written around non-goals.** Each agent file starts with what the agent does *not* do. This produces tighter, more reliable delegation.
+- **A bootstrap script for the Claude app workflow.** Most public configs target the CLI; the app's per-session-repo model means user-level install doesn't apply, so this pack scaffolds at project level via `bootstrap.sh`.
 
 ## Other references
 
 Patterns and ideas in the docs also draw on:
 
 - Anthropic's [Claude Code documentation](https://docs.anthropic.com/en/docs/claude-code)
-- Anthropic's ["Demystifying evals for AI agents"](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) — for the pass@k framing
-- Boris Cherny (Anthropic) on parallel terminal instances — relayed through the source longform guide
+- Anthropic's ["Demystifying evals for AI agents"](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) — for the pass@k / pass^k framing
+- Boris Cherny (Anthropic) on parallel terminal instances — relayed via the source longform guide
 - The general body of practice around git worktrees, tmux, and CLI-first development
 
-If you spot something here that you recognize from your own work and want credited (or removed), open an issue.
+If you recognise something here from your own work that should be credited or removed, open an issue.

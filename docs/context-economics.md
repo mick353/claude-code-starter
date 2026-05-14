@@ -65,9 +65,14 @@ CLAUDE.md ≤ 150 lines
 
 Add more for specific tasks; trim back after.
 
-## A note on benchmark claims
+## On benchmark claims (any tool, not just one)
 
-The source repo (and parts of the wider Claude Code community) make specific token-saving claims about particular tools — for example, that `mgrep` uses ~50% fewer tokens than `grep` in a 50-task benchmark. These numbers are plausible in principle (smarter search returns smaller match sets) but are vendor-published and the methodology isn't always public. Treat such numbers as directional, not load-bearing. The general claim "noisy tools eat context" is correct; the specific multiplier on any given tool is worth measuring in your own workflow before depending on it.
+You'll encounter specific token-saving claims for individual tools in the broader Claude Code ecosystem — "tool X uses 50% fewer tokens than tool Y on our N-task benchmark." Some of these claims are well-supported; many are directional. Two reasons to take all of them as starting points rather than conclusions:
+
+1. **Benchmark methodology varies.** Task selection, model choice, prompt structure, and what counts as "the same output quality" all affect the result. A tool that wins by 50% on retrieval-heavy tasks may break even or lose on generation-heavy ones.
+2. **Your workflow is not the benchmark.** Even with sound methodology, the tasks you actually do may not match the benchmark distribution. Local measurement on representative tasks beats inherited numbers.
+
+The general principle — *noisy tools eat context, smarter tools eat less* — is sound and worth optimising for. The specific multiplier on any given tool is worth verifying in your own workflow before depending on it for cost or capacity planning.
 
 ## Quick checklist
 

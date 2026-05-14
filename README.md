@@ -4,6 +4,16 @@ A lean, opinionated config pack for [Claude Code](https://docs.anthropic.com/en/
 
 ---
 
+## Why this exists
+
+Most public Claude Code configurations lean toward "more is better" — fifty agents, two hundred skills, breathless marketing about productivity multipliers. Some of the underlying patterns are real and useful. Most of the bulk is noise that competes for the same finite context window every session.
+
+This pack goes the other way. A small, curated set of pieces, each justified, with the reasoning explained in [`docs/`](docs/). The underlying principle is one sentence: **Claude's effective intelligence is bounded by the quality of its context, not the size of it.** Everything in this repo — what's included, what was deliberately left out, why the agent roster is exactly five — follows from that single idea. The full argument is in [`docs/philosophy.md`](docs/philosophy.md).
+
+If you've been overwhelmed by larger configs, or you've never installed one and want a clean starting point, this is the one I'd recommend.
+
+---
+
 ## ⚡ Quick start — using Claude Code in the Claude app
 
 You're probably here for this. If you use Claude Code through the Claude mobile or desktop app (not the terminal CLI), you select one repo per session. To get the benefits of this starter pack on a new project, you bake the config *into that project's repo*. Once it's there, every Claude Code session attached to that repo loads the config automatically.
@@ -43,25 +53,24 @@ The template includes placeholders like `<STACK>`, `<RUNTIME>`, and "Where thing
 
 ---
 
-## What this is
+## What's in the pack
 
-A few dozen files. Roughly:
+Logical pieces, not file counts:
 
-- **`docs/`** — Six short guides on the things most people get wrong: context economics, model selection, parallelization, memory, evals, and subagent orchestration.
-- **`claude/rules/`** — A compact rules taxonomy that drops into a project's `.claude/rules/` (or `~/.claude/rules/` for terminal CLI users).
-- **`claude/agents/`** — Five subagent definitions covering the main delegation patterns. Add more only when you have a real reason.
-- **`claude/skills/`** — Four skills focused on workflow primitives, not language-specific recipes.
-- **`claude/hooks/hooks.example.json`** — A minimal hook config you can extend.
-- **`claude/contexts/`** — Three system-prompt context files for use with `claude --system-prompt` (terminal CLI only).
-- **`claude/CLAUDE.template.md`** — A starter `CLAUDE.md` for new projects.
-- **`bootstrap.sh`** — One-shot scaffolding script for new project repos.
+- **5 rules** in `claude/rules/` — always-loaded behaviour guidance. Two are recommended as defaults (security, performance); three are optional (coding-style, testing, git-workflow). Always-loaded means context-expensive, so pick deliberately.
+- **5 subagents** in `claude/agents/` — on-demand specialists. Planner, code reviewer, security reviewer, TDD guide, refactor cleaner. Add more only when an existing one is genuinely overloaded.
+- **4 skills** in `claude/skills/` — workflow primitives. TDD workflow, search-first, iterative retrieval for subagents, strategic compaction at session boundaries.
+- **3 system-prompt contexts** in `claude/contexts/` — for mode-specific sessions when using the CLI: `claude-dev`, `claude-review`, `claude-research`.
+- **1 hook config** in `claude/hooks/` — example PostToolUse / Stop / SessionStart hooks for console.log warnings and session-memory pointers.
+- **1 CLAUDE.md template** in `claude/` — starter project routing file used by `bootstrap.sh`.
+- **7 docs** in `docs/` — short essays on the patterns. Philosophy, context economics, model selection, memory persistence, subagent orchestration, parallelization, evals.
 
 ## What this is *not*
 
-- Not a 200-skill mega-bundle. The point is that **bigger is worse** — every skill, agent, and MCP description eats your context window. See [`docs/context-economics.md`](docs/context-economics.md).
+- Not a 200-skill mega-bundle. Bigger is worse — every skill, agent, and MCP description competes for your context window. See [`docs/context-economics.md`](docs/context-economics.md).
 - Not a framework or plugin. There's nothing to install. You scaffold from it; you don't depend on it.
 - Not language-specific. Add language packs to a project's `.claude/` as separate files when you need them.
-- Not portable to ChatGPT Codex, Cursor, Copilot, etc. The *ideas* transfer (model selection, context economics, etc.); the file format is Claude Code-specific.
+- Not portable to ChatGPT, Cursor, Copilot, etc. The *ideas* transfer (model selection, context economics, etc.); the file format is Claude Code-specific.
 - Not magic. These are conventions and templates. They work because they're simple.
 
 ---
@@ -123,9 +132,9 @@ Each is 1-3 pages. None are theoretical.
 
 ## Attribution
 
-The patterns and structure here are informed by [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code). That repo is sprawling and aggressively marketed but contains real ideas underneath. This starter pack distills the parts that hold up to scrutiny, leaves out the parts that don't, and adds critical commentary where the source overclaims. See [`ATTRIBUTION.md`](ATTRIBUTION.md) for specifics.
+The patterns and structure here draw on [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code), which has a broader scope than this repo and packages many useful ideas worth extracting. This pack distills the patterns that held up in practice, omits the parts that didn't, and adds explicit reasoning where the original was implicit. See [`ATTRIBUTION.md`](ATTRIBUTION.md) for the per-pattern table.
 
-Other influences are credited inline where relevant.
+Other influences are credited inline in the docs where relevant.
 
 ## License
 
